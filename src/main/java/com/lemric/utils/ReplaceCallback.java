@@ -1,5 +1,6 @@
 package com.lemric.utils;
 
+import java.util.ArrayList;
 import java.util.Stack;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
@@ -26,7 +27,7 @@ import java.util.regex.Pattern;
  */
 public class ReplaceCallback {
     public static interface Callback {
-        public String matches(MatchResult match);
+        public String matches(ArrayList<ArrayList<ArrayList<Object>>> match);
     }
 
     private final Pattern pattern;
@@ -54,7 +55,7 @@ public class ReplaceCallback {
         while(matcher.find()) {
             final MatchResult matchResult = matcher.toMatchResult();
             Result r = new Result();
-            r.replace = callback.matches(matchResult);
+            r.replace = callback.matches(this.parse(matchResult));
             if(r.replace == null)
                 continue;
             r.start = matchResult.start();
@@ -67,6 +68,20 @@ public class ReplaceCallback {
             string = string.substring(0, r.start) + r.replace + string.substring(r.end);
         }
         return string;
+    }
+
+    private ArrayList<ArrayList<ArrayList<Object>>> parse(MatchResult m) {
+        ArrayList<ArrayList<ArrayList<Object>>> list = new ArrayList<>();
+        ArrayList<ArrayList<Object>> list2 = new ArrayList<>();
+        for(int i = 0; i < m.groupCount(); i++) {
+            int e = i;
+            list2.add(new ArrayList<>() {{
+                add(m.group(e));
+                add(m.start(e));
+            }});
+        }
+        list.add(list2);
+        return list;
     }
 
     /**
