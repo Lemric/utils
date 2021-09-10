@@ -3,20 +3,20 @@ package com.lemric.utils;
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 
-public class Uniqid {
+public final class Uniqid {
 
-    public String uniqid(String prefix, boolean more_entropy) {
+    public static String uniqid(String prefix, boolean more_entropy) {
         long time = System.currentTimeMillis();
         String uniqid = "";
         if(!more_entropy) {
             uniqid = String.format("%s%08x%05x", prefix, time / 1000, time);
         } else {
-            uniqid = this.uniqid(prefix);
+            uniqid = Uniqid.uniqid(prefix);
         }
 
         return uniqid ;
     }
-    public String uniqid(String prefix) {
+    public static String uniqid(String prefix) {
         long time = System.currentTimeMillis();
         String uniqid = "";
         String format = String.format("%s%08x%05x", prefix, time / 1000, time);
