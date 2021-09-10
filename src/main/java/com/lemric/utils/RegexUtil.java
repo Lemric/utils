@@ -15,16 +15,20 @@ public class RegexUtil {
         Pattern p = Pattern.compile(pattern);
         Matcher m = p.matcher(subject);
         while(m.find()) {
-            ArrayList<ArrayList<Object>> list2 = new ArrayList<>();
-            for(int i = 0; i < m.groupCount(); i++) {
-                int e = i;
-                list2.add(new ArrayList<>() {{
-                    add(m.group(e));
-                    add(m.start(e));
+            list.add(new ArrayList<>() {{
+                add(new ArrayList<>() {{
+                    add(m.group(0));
+                    add(m.start(0));
                 }});
-            }
-            list.add(list2);
-
+                add(new ArrayList<>() {{
+                    add(m.group(1));
+                    add(m.start(1));
+                }});
+                add(new ArrayList<>() {{
+                    add(m.group(2));
+                    add(m.start(2));
+                }});
+            }});
         }
 
         return list;
