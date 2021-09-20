@@ -8,6 +8,6 @@ class RegexUtilTest {
 
     @Test
     public void test() {
-            Pcre.preg_match("/^/foo/(?<foo>[^\\/]++)?$/sD", "/foo/bar");
+            Pcre.preg_match("{^/foo/?$}sD", "/foo");
     }
 }

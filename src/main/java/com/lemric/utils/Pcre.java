@@ -3,8 +3,8 @@ package com.lemric.utils;
 import java.util.Arrays;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.google.re2j.Matcher;
+import com.google.re2j.Pattern;
 
 public class Pcre {
 
@@ -41,7 +41,6 @@ public class Pcre {
             "[", //18
             "]", //19
             "*", //20
-            "?", //21
             "%", //22
             "(", //23
             ")" //24
@@ -68,7 +67,6 @@ public class Pcre {
             "\\[", //18
             "\\]", //19
             "\\*", //20
-            "\\?", //21
             "\\%", //22
             "\\(", //23
             "\\)" //24
