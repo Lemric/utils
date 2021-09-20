@@ -84,7 +84,6 @@ public class Pcre {
     public static int preg_match(Pattern p, String subject) {
         Matcher m = p.matcher(subject); // get a matcher object
         int count = 0;
-        //System.out.println("Trying to find matches using pattern:'"+pattern+"' on subject:'"+subject+"'");
         while (m.find()) {
             count++;
             return count;
@@ -282,7 +281,10 @@ public class Pcre {
     }
 
     public static Pattern compile(String pattern) {
-        return Pattern.compile(Pcre.getPatternWithoutFlags(pattern), Pcre.getPatternFlags(pattern));
+        Pattern compile = Pattern.compile(Pcre.getPatternWithoutFlags(pattern), Pcre.getPatternFlags(pattern));
+
+        System.out.println(Pcre.getPatternWithoutFlags(pattern));
+        return compile;
     }
 
     public static String getPatternWithoutFlags(String pattern) {
