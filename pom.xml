@@ -75,6 +75,11 @@
             <version>13.0</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>net.amygdalum</groupId>
+            <artifactId>regexparser</artifactId>
+            <version>0.1.0</version>
+        </dependency>
     </dependencies>
     <distributionManagement>
         <repository>

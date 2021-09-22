@@ -1,12 +1,25 @@
 package com.lemric.utils;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import com.google.re2j.Matcher;
-import com.google.re2j.Pattern;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Pcre {
+
+
+    private static String groupCapturePCRE = "?P";
+    private static String groupCaptureJava = "?";
+    private static HashMap<String, String> delimiters = new HashMap<>() {{
+        put("{", "}");
+        put("/", "/");
+        put("#", "#");
+        put("@", "@");
+        put("!", "!");
+        put("%", "%");
+    }};
 
     public static String siu = "siu";
     public static String u = "u";
@@ -76,20 +89,18 @@ public class Pcre {
     public Pcre() {
     }
 
-    public static int preg_match(String pattern, String subject) {
+    public static boolean preg_match(String pattern, String subject) {
         Pattern p = Pcre.compile(pattern);
         return preg_match(p, subject);
     }
 
-    public static int preg_match(Pattern p, String subject) {
+    public static boolean preg_match(Pattern p, String subject) {
         Matcher m = p.matcher(subject); // get a matcher object
-        int count = 0;
         while (m.find()) {
-            count++;
-            return count;
+            return true;
         }
 
-        return 0;
+        return false;
     }
 
     public static String preg_match(String pattern, String subject, boolean return_matches) {
@@ -313,5 +324,21 @@ public class Pcre {
         }
 
         return Pattern.CASE_INSENSITIVE;
+    }
+    public static String parseRegExp(String regexp) {
+        if(regexp.length() > 0) {
+            String delimiterOpen = String.valueOf(regexp.charAt(0));
+            String delimiterClose = delimiters.get(delimiterOpen);
+            String regexpWithoutOptions = StringUtils.substringBeforeLast(regexp, delimiterClose) + delimiterClose;
+            if(regexpWithoutOptions.length() > 0 && regexpWithoutOptions.length() != regexp.length()) {
+                String delimiterClose2 = String.valueOf(regexpWithoutOptions.charAt(regexpWithoutOptions.length() -1));
+                if (delimiterClose2.equals(delimiterClose)) {
+                    regexp = regexpWithoutOptions.replace(delimiterOpen, "")
+                            .replace(delimiterClose2, "")
+                            .replace(groupCapturePCRE + "<", groupCaptureJava + "<");
+                }
+            }
+        }
+        return regexp.replace("\\/", "/");
     }
 }
