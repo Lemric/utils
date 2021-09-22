@@ -1,9 +1,8 @@
 package com.lemric.utils;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -90,33 +89,34 @@ public class Pcre {
     }
 
     public static boolean preg_match(String pattern, String subject) {
-        Pattern p = Pcre.compile(pattern);
-        return preg_match(p, subject);
+        return preg_match(pattern, subject, new HashMap<>());
     }
 
-    public static boolean preg_match(Pattern p, String subject) {
-        Matcher m = p.matcher(subject); // get a matcher object
-        while (m.find()) {
+    public static boolean preg_match(String pattern, String input, Map<String, Object> matches) {
+        Pattern r = Pcre.compile(pattern);
+        Matcher m = r.matcher(input);
+
+        if (m.matches()) {
+            Map<String, Integer> namedGroups = null;
+            try {
+                namedGroups = getNamedGroups(r);
+            } catch (Exception ignored) {
+            }
+            int groupCount = m.groupCount() + 1;
+            for(int i = 0; i < groupCount; i++) {
+                matches.put(String.valueOf(i), m.group(i));
+            }
+            if (namedGroups != null) {
+                for (Map.Entry<String, Integer> stringIntegerEntry : namedGroups.entrySet()) {
+                    matches.put(stringIntegerEntry.getKey(), m.group(stringIntegerEntry.getKey()));
+                }
+            }
+
+            System.out.println(matches);
             return true;
+        } else {
+            return false;
         }
-
-        return false;
-    }
-
-    public static String preg_match(String pattern, String subject, boolean return_matches) {
-        Pattern p = Pcre.compile(pattern);
-        return  preg_match(p, subject, return_matches);
-    }
-
-    public static String preg_match(Pattern p, String subject, boolean return_matches) {
-        Matcher m = p.matcher(subject); // get a matcher object
-        int count = 0;
-        while (m.find()) {
-            count++;
-            return (return_matches) ? m.group() : String.valueOf(count);
-        }
-
-        return (return_matches) ? "0" : "";
     }
 
     public static String[] preg_match_all(String pattern, String subject) {
@@ -292,10 +292,7 @@ public class Pcre {
     }
 
     public static Pattern compile(String pattern) {
-        Pattern compile = Pattern.compile(Pcre.getPatternWithoutFlags(pattern), Pcre.getPatternFlags(pattern));
-
-        System.out.println(Pcre.getPatternWithoutFlags(pattern));
-        return compile;
+        return Pattern.compile(Pcre.getPatternWithoutFlags(pattern), Pcre.getPatternFlags(pattern));
     }
 
     public static String getPatternWithoutFlags(String pattern) {
@@ -340,5 +337,24 @@ public class Pcre {
             }
         }
         return regexp.replace("\\/", "/");
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, Integer> getNamedGroups(Pattern regex)
+            throws NoSuchMethodException, SecurityException,
+            IllegalAccessException, IllegalArgumentException,
+            InvocationTargetException {
+
+        Method namedGroupsMethod = Pattern.class.getDeclaredMethod("namedGroups");
+        namedGroupsMethod.setAccessible(true);
+
+        Map<String, Integer> namedGroups = null;
+        namedGroups = (Map<String, Integer>) namedGroupsMethod.invoke(regex);
+
+        if (namedGroups == null) {
+            throw new InternalError();
+        }
+
+        return Collections.unmodifiableMap(namedGroups);
     }
 }
