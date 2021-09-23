@@ -157,10 +157,7 @@ public class Pcre {
         return (split) ? out.toString().split(spc) : new String[0];
     }
 
-    public static Object[] array_unique(Object array[]) {
-        SortedSet<Object> set = new TreeSet<>(Arrays.asList(array));
-        return set.toArray();
-    }
+
 
     public static String preg_replace(String pattern, String replacement, String subject) {
         Pattern p = Pcre.compile(pattern);
@@ -266,29 +263,6 @@ public class Pcre {
 
     public static String preg_quote(String str) {
         return Pcre.str_replace(Pcre.SLASH_CHARACTERS, Pcre.SLASH_CHARACTERS_SUBSTITUTION, str);
-    }
-
-    public static String[] array_merge(String[] array1, String[] array2) {
-        int i = 0;
-        if (array1 != null && array1.length > 0 && array2 != null && array2.length > 0) {
-            String[] array3 = new String[array1.length + array2.length];
-            for (String element : array1) {
-                array3[i] = element;
-                i++;
-            }
-            for (String element : array2) {
-                array3[i] = element;
-                i++;
-            }
-
-            return array3;
-        } else if (array1 != null && array1.length > 0) {
-            return array1;
-        } else if (array2 != null && array2.length > 0) {
-            return array2;
-        } else {
-            return null;
-        }
     }
 
     public static Pattern compile(String pattern) {
