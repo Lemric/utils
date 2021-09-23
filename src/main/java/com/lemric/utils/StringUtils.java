@@ -190,6 +190,10 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         return str_replace(string, oldValPatt, newVal, count);
     }
 
+    public static String str_repeat(String str, int times) {
+        return new String(new char[times]).replace("\0", str);
+    }
+
     /**
      * UTF-8 aware alternative to ucfirst
      * Make a string's first character uppercase

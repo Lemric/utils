@@ -6,11 +6,15 @@ public class ArrayUtils extends org.apache.commons.lang3.ArrayUtils {
     public static Map<String, Object> array_replace(Map<String, Object> array, Object[] ...replacements) {
 
         int maxLength = array.size();
-        Map<String, Object> newArray = new HashMap<>();
+        Map<String, Object> newArray = new HashMap<>(array);
         for (int i = 0; i < maxLength; i++) {
-            if(array.size() > i) {
-                newArray.put(String.valueOf(i), array.get(i));
+            for (Object[] replacement : replacements) {
+                if(replacement.length > maxLength) {
+                    maxLength = replacement.length;
+                }
             }
+        }
+        for (int i = 0; i < maxLength; i++) {
             for (Object[] replacement : replacements) {
                 if(replacement.length > i) {
                     newArray.put(String.valueOf(i), replacement[i]);
