@@ -2,8 +2,8 @@ package com.lemric.utils;
 
 import java.util.*;
 
-public class ArrayUtils {
-    private static Map<String, Object> array_replace(Map<String, Object> array, Object[] ...replacements) {
+public class ArrayUtils extends org.apache.commons.lang3.ArrayUtils {
+    public static Map<String, Object> array_replace(Map<String, Object> array, Object[] ...replacements) {
 
         int maxLength = array.size();
         Map<String, Object> newArray = new HashMap<>();
