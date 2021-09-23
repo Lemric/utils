@@ -72,25 +72,15 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         return string.lastIndexOf(search);
     }
 
-    /**
-     * UTF-8 aware alternative to substr
-     * Return part of a string given character offset (and optionally length)
-     * @param string - string value to operate on.
-     * @param offset integer number of UTF-8 characters offset (from left)
-     * @param length integer length in UTF-8 characters from offset
-     * @return mixed string or "" if failure
-     * @see //www.php.net/substr
-     */
-    public static String substr(String string, int offset, int length) {
-        if (empty(string)) {
-            return "";
+    public static String substr(String string, int start) {
+        return substr(string, start, null);
+    }
+    public static String substr(String string, int start, Integer length) {
+        if (length == null) {
+            return string.substring(start);
+        } else {
+            return string.substring(start, start + length);
         }
-        if (offset < 0 || length < 1) {
-            return "";
-        }
-        int start = Math.min(string.length() - 1, offset);
-        int end = Math.min(string.length() - 1, offset + length - 1);
-        return string.substring(start, end);
     }
 
     /**
@@ -144,17 +134,24 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         return string.length();
     }
 
-    /**
-     * UTF-8 aware alternative to str_replace
-     * @param string string to search
-     * @param oldValPatt existing string to replace
-     * @param newVal new string to replace with
-     * @see //www.php.net/str_ireplace
-     */
-    public static String str_replace(String string, String oldValPatt, String newVal) {
-        return str_replace(string, oldValPatt, newVal, Integer.MAX_VALUE);
+    public static String str_replace(String search, String replace, String subject) {
+        return subject.replace(search, replace);
     }
 
+    public static String str_replace(String[] search, String replace, String subject) {
+        String result = subject;
+        for (String s : search) {
+            result = result.replace(s, replace);
+        }
+        return result;
+    }
+
+    public static String str_replace(String[] search, String [] replace, String subject) {
+        for (int i = 0; i < search.length && i < replace.length; i++) {
+            subject = subject.replace(search[i], replace[i]);
+        }
+        return subject;
+    }
     /**
      * UTF-8 aware alternative to str_replace
      * @param string string to search
@@ -304,26 +301,90 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         return rtrim(string, charlist);
     }
 
-    /**
-     * UTF-8 aware substr_replace
-     * Replace text within a portion of a string
-     * @param string the value to operate on.
-     * @param newVal the replacement string
-     * @param start int postion in string to start.
-     * @param length int length to operate on.
-     * @see //www.php.net/substr_replace
-     */
-    public static String substr_replace(String string, String newVal, int start, int length) {
-        if (empty(string)) {
-            return "";
+    public static String substr_replace(String string, String replacement, int start) {
+        return substr_replace(string, replacement, start, null);
+    }
+
+    public static String substr_replace(String string, String replacement, int start, Integer length) {
+        StringBuilder sb = new StringBuilder();
+        if (length == null) {
+            if (start >= 0) {
+                for (int i = 0; i < start; i++) {
+                    sb.append(string.charAt(i));
+                }
+                for (int i = 0; i < replacement.length(); i++) {
+                    sb.append(replacement.charAt(i));
+                }
+                for (int i = start + replacement.length(); i < string.length(); i++) {
+                    sb.append(string.charAt(i));
+                }
+            } else {
+                for (int i = 0; i < string.length() + start; i++) {
+                    sb.append(string.charAt(i));
+                }
+                for (int i = 0; i < replacement.length(); i++) {
+                    sb.append(replacement.charAt(i));
+                }
+                for (int i = string.length() + start + replacement.length(); i < string.length(); i++) {
+                    sb.append(string.charAt(i));
+                }
+            }
+        } else {
+            if (start >= 0) {
+                for (int i = 0; i < start; i++) {
+                    sb.append(string.charAt(i));
+                }
+                if (length > 0) {
+                    for (int i = 0; i < length; i++) {
+                        sb.append(replacement.charAt(i));
+                    }
+                    for (int i = start + length; i < string.length(); i++) {
+                        sb.append(string.charAt(i));
+                    }
+                } else if (length < 0) {
+                    for (int i = replacement.length() + length; i < replacement.length(); i++) {
+                        sb.append(replacement.charAt(i));
+                    }
+                    for (int i = start - length; i < string.length(); i++) {
+                        sb.append(string.charAt(i));
+                    }
+                } else {
+                    for (int i = 0; i < replacement.length(); i++) {
+                        sb.append(replacement.charAt(i));
+                    }
+                    for (int i = start; i < string.length(); i++) {
+                        sb.append(string.charAt(i));
+                    }
+                }
+            } else {
+                for (int i = 0; i < string.length() + start; i++) {
+                    sb.append(string.charAt(i));
+                }
+                if (length > 0) {
+                    for (int i = 0; i < length; i++) {
+                        sb.append(replacement.charAt(i));
+                    }
+                    for (int i = string.length() + start + length; i < string.length(); i++) {
+                        sb.append(string.charAt(i));
+                    }
+                } else if (length < 0) {
+                    for (int i = replacement.length() + length; i < replacement.length(); i++) {
+                        sb.append(replacement.charAt(i));
+                    }
+                    for (int i = string.length() + start - length; i < string.length(); i++) {
+                        sb.append(string.charAt(i));
+                    }
+                } else {
+                    for (int i = 0; i < replacement.length(); i++) {
+                        sb.append(replacement.charAt(i));
+                    }
+                    for (int i = string.length() + start; i < string.length(); i++) {
+                        sb.append(string.charAt(i));
+                    }
+                }
+            }
         }
-        if (empty(newVal)) {
-            return string;
-        }
-        String sub0 = string.substring(0, start);
-        int end = Math.min(start + length - 1, string.length() - 1);
-        String sub1 = string.substring(end);
-        return sub0 + newVal + sub1;
+        return sb.toString();
     }
 
     public static int strcmp(String string1, String string2) {
