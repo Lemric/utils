@@ -3,6 +3,13 @@ package com.lemric.utils;
 import java.util.*;
 
 public class ArrayUtils extends org.apache.commons.lang3.ArrayUtils {
+    public static <K,V> Map<V,K> array_flip(Map<K,V> map) {
+        Map<V,K> flipped = new HashMap<>();
+        for(Map.Entry<K,V> entry : map.entrySet()) {
+            flipped.put(entry.getValue(), entry.getKey());
+        }
+        return flipped;
+    }
     public static Map<String, Object> array_replace(Map<String, Object> array, Object[] ...replacements) {
 
         int maxLength = array.size();

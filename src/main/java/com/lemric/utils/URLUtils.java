@@ -84,12 +84,11 @@ public class URLUtils {
             return "";
         }
 
-        str = str.replace("\\\\", "\\");
-        Charset charset;
-        charset = StandardCharsets.UTF_8;
         StringBuilder sb = new StringBuilder();
+
         for (int i = 0; i < str.length(); i++) {
             char ch = str.charAt(i);
+
             if ('a' <= ch && ch <= 'z'
                     || 'A' <= ch && ch <= 'Z'
                     || '0' <= ch && ch <= '9'
@@ -97,28 +96,101 @@ public class URLUtils {
                 sb.append(ch);
             }
             else {
-                if(ch>128){
-                    byte[] ba = (ch+ "").getBytes(charset);
-                    for (byte b : ba) {
-                        sb.append('%');
-                        char ch0 = Character.forDigit((b >> 4) & 0xF, 16);
-
-                        if (Character.isLetter(ch0)) {
-                            ch0 -= caseDiff;
-                        }
-                        sb.append(ch0);
-                        ch0 = Character.forDigit(b & 0xF, 16);
-                        if (Character.isLetter(ch0)) {
-                            ch0 -= caseDiff;
-                        }
-                        sb.append(ch0);
-                    }
-                } else {
-                    sb.append("%");
-                    sb.append(toHexDigit(ch >> 4));
-                    sb.append(toHexDigit(ch));
-                }
+                sb.append('%');
+                sb.append(toHexDigit(ch >> 4));
+                sb.append(toHexDigit(ch));
             }
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * Gets the magic quotes value.
+     */
+    public static String urlencode(String str) {
+        StringBuilder sb = new StringBuilder();
+        urlencode(sb, str);
+
+        return sb.toString();
+    }
+
+    /**
+     * Gets the magic quotes value.
+     */
+    private static void urlencode(StringBuilder sb, String str) {
+        int len = str.length();
+
+        for (int i = 0; i < len; i++) {
+            char ch = str.charAt(i);
+            if('\n' == ch) {
+                sb.append("%0A");
+            } else if ('a' <= ch && ch <= 'z') {
+                sb.append(ch);
+            } else if ('A' <= ch && ch <= 'Z') {
+                sb.append(ch);
+            } else if ('0' <= ch && ch <= '9') {
+                sb.append(ch);
+            } else if (ch == '-' || ch == '_' || ch == '.') {
+                sb.append(ch);
+            } else if (ch == ' ') {
+                sb.append('+');
+            } else {
+                sb.append('%');
+                sb.append(toHexDigit(ch / 16));
+                sb.append(toHexDigit(ch));
+            }
+        }
+    }
+
+    /**
+     * Returns the decoded string.
+     */
+    public static String urldecode(String s) {
+        if (s == null)
+            return "";
+
+        int len = s.length();
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < len; i++) {
+            char ch = s.charAt(i);
+
+            if (ch == '%' && i + 2 < len) {
+                int d1 = s.charAt(i + 1);
+                int d2 = s.charAt(i + 2);
+
+                int v = 0;
+
+                if ('0' <= d1 && d1 <= '9')
+                    v = 16 * (d1 - '0');
+                else if ('a' <= d1 && d1 <= 'f')
+                    v = 16 * (d1 - 'a' + 10);
+                else if ('A' <= d1 && d1 <= 'F')
+                    v = 16 * (d1 - 'A' + 10);
+                else {
+                    sb.append('%');
+                    continue;
+                }
+
+                if ('0' <= d2 && d2 <= '9')
+                    v += (d2 - '0');
+                else if ('a' <= d2 && d2 <= 'f')
+                    v += (d2 - 'a' + 10);
+                else if ('A' <= d2 && d2 <= 'F')
+                    v += (d2 - 'A' + 10);
+                else {
+                    sb.append('%');
+                    continue;
+                }
+
+                i += 2;
+                sb.append((char) v);
+            }
+            else if (ch == '+')
+                sb.append(' ');
+            else
+                sb.append(ch);
         }
 
         return sb.toString();
@@ -132,7 +204,6 @@ public class URLUtils {
             return (char) ('A' + d - 10);
         }
     }
-    static final int caseDiff = ('a' - 'A');
 
     public static String evaluate(String urlStr, String partToExtract) {
         if (urlStr == null || partToExtract == null) {

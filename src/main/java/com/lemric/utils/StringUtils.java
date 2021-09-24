@@ -1,6 +1,8 @@
 package com.lemric.utils;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -490,17 +492,16 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         return StringTools.reverse(string);
     }
 
-    public static String strtr(String str, String froms, String tos)
-    {
-        char[] str1=str.toCharArray();
-        int j;
-        for (int i=0,len=str.length(); i<len; ++i) {
-            j=froms.indexOf(str.charAt(i));
-            if (j!=-1) {
-                str1[i]=tos.charAt(j);
-            }
+    public static String strtr(String str, String from, String tos) {
+        return StringUtils.strtr(str, new HashMap<>() {{
+            put(from, tos);
+        }});
+    }
+    public static String strtr(String str, HashMap<String, String> replace_pairs) {
+        for (Map.Entry<String, String> stringStringEntry : replace_pairs.entrySet()) {
+            str = str.replace(stringStringEntry.getKey(), stringStringEntry.getValue());
         }
-        return String.valueOf(str1);
+        return str;
     }
 
     public static boolean pregMatch(String pattern, String content) {
@@ -521,6 +522,31 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         for(int i=0;i< s.length();i++) {
             if(accept.indexOf(s.charAt(i))!=-1) {
                 return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean str_contains(String check, String frag) {
+        char[] chk = check.toCharArray();
+        char[] frg = frag.toCharArray();
+
+        char ch1 = frg[0];
+        for (int i=0; i<chk.length; ++i) {
+
+            if(chk[i] == ch1 && (chk.length-i) >= frg.length) {
+
+                int count = 0;
+                for (char c : frg) {
+                    if (chk[i] == c) {
+                        ++count;
+                    } else {
+                        break;
+                    }
+                }
+                if (count == frg.length) {
+                    return true;
+                }
             }
         }
         return false;
