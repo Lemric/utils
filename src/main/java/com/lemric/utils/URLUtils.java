@@ -32,6 +32,9 @@ public class URLUtils {
     public static String rawUrlDecode(String url) {
         return java.net.URLDecoder.decode(url, StandardCharsets.UTF_8);
     }
+    public static String rawUrlEncode(String url) {
+        return java.net.URLEncoder.encode(url, StandardCharsets.UTF_8);
+    }
 
     public static String evaluate(String urlStr, String partToExtract) {
         if (urlStr == null || partToExtract == null) {

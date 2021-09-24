@@ -3,8 +3,8 @@ package com.lemric.utils;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.google.code.regexp.Matcher;
+import com.google.code.regexp.Pattern;
 
 public class Pcre {
 
@@ -97,22 +97,14 @@ public class Pcre {
         Matcher m = r.matcher(input);
 
         if (m.matches()) {
-            Map<String, Integer> namedGroups = null;
-            try {
-                namedGroups = getNamedGroups(r);
-            } catch (Exception ignored) {
+            Map<String, String> namedGroups = m.namedGroups();
+            for (Map.Entry<String, String> stringStringEntry : namedGroups.entrySet()) {
+                matches.put(stringStringEntry.getKey(), m.group(stringStringEntry.getKey()));
             }
             int groupCount = m.groupCount() + 1;
             for(int i = 0; i < groupCount; i++) {
                 matches.put(String.valueOf(i), m.group(i));
             }
-            if (namedGroups != null) {
-                for (Map.Entry<String, Integer> stringIntegerEntry : namedGroups.entrySet()) {
-                    matches.put(stringIntegerEntry.getKey(), m.group(stringIntegerEntry.getKey()));
-                }
-            }
-
-            System.out.println(matches);
             return true;
         } else {
             return false;
@@ -266,7 +258,7 @@ public class Pcre {
     }
 
     public static Pattern compile(String pattern) {
-        return Pattern.compile(Pcre.getPatternWithoutFlags(pattern), Pcre.getPatternFlags(pattern));
+        return Pattern.compile(Pcre.getPatternWithoutFlags(pattern));
     }
 
     public static String getPatternWithoutFlags(String pattern) {
@@ -286,16 +278,6 @@ public class Pcre {
         return pattern;
     }
 
-    public static int getPatternFlags(String pattern) {
-
-        for (String s_alws : s_alwsp) {
-            if (pattern.startsWith(s_alws) && pattern.endsWith(s_alws + siu)) {
-                return (Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-            }
-        }
-
-        return Pattern.CASE_INSENSITIVE;
-    }
     public static String parseRegExp(String regexp) {
         if(regexp.length() > 0) {
             String delimiterOpen = String.valueOf(regexp.charAt(0));
