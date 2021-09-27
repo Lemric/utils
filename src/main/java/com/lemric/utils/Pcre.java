@@ -8,6 +8,9 @@ import com.google.code.regexp.Pattern;
 
 public class Pcre {
 
+    public static final int PREG_PATTERN_ORDER = 1;
+    public static final int PREG_SET_ORDER = 2;
+    public static final int PREG_OFFSET_CAPTURE = 256;
 
     private static String groupCapturePCRE = "?P";
     private static String groupCaptureJava = "?";
@@ -128,6 +131,76 @@ public class Pcre {
         }
 
         return (split) ? out.toString().split(spc) : new String[0];
+    }
+
+    public static boolean preg_match_all(String pattern, String subject, ArrayList<ArrayList<ArrayList<Object>>> matches, int flags) {
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile(pattern);
+        java.util.regex.Matcher m = p.matcher(subject);
+        if (flags == (PREG_OFFSET_CAPTURE) || flags == (PREG_SET_ORDER) ) {
+            matches.add(new ArrayList<>());
+            matches.add(new ArrayList<>());
+            matches.add(new ArrayList<>());
+        }
+
+
+        boolean match = false;
+        while(m.find()) {
+            match = true;
+            if (flags == (PREG_OFFSET_CAPTURE | PREG_SET_ORDER)) {
+                matches.add(new ArrayList<>() {{
+                    add(new ArrayList<>() {{
+                        String group = m.group(0);
+                        add(group == null ? "" : group);
+                        add(m.start(0));
+                    }});
+                    add(new ArrayList<>() {{
+                        String group = m.group(1);
+                        add(group == null ? "" : group);
+                        add(m.start(1));
+                    }});
+                    add(new ArrayList<>() {{
+                        String group = m.group(2);
+                        add(group == null ? "" : group);
+                        add(m.start(2));
+                    }});
+                }});
+            } else if (flags == (PREG_OFFSET_CAPTURE)) {
+                matches.get(0).add(new ArrayList<>() {{
+                    String group = m.group(0);
+                    add(group == null ? "" : group);
+                    add(m.start(0));
+                }});
+                matches.get(1).add(new ArrayList<>() {{
+                    String group = m.group(1);
+                    add(group == null ? "" : group);
+                    add(m.start(1));
+                }});
+                matches.get(2).add(new ArrayList<>() {{
+                    String group = m.group(2);
+                    add(group == null ? "" : group);
+                    add(m.start(2));
+                }});
+            } else if (flags == (PREG_SET_ORDER)) {
+                matches.get(0).add(new ArrayList<>() {{
+                    String group = m.group(0);
+                    add(group == null ? "" : group);
+                    add(m.start(0));
+                }});
+                matches.get(1).add(new ArrayList<>() {{
+                    String group = m.group(1);
+                    add(group == null ? "" : group);
+                    add(m.start(1));
+                }});
+                matches.get(2).add(new ArrayList<>() {{
+                    String group = m.group(2);
+                    add(group == null ? "" : group);
+                    add(m.start(2));
+                }});
+            }
+
+        }
+
+        return match;
     }
 
     public static String[] preg_match_all(String pattern, String subject, int groups) {
