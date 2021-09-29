@@ -561,8 +561,12 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         return null;
     }
     public static boolean strpbrk(final String s,final String accept) {
-        for(int i=0;i< s.length();i++) {
-            if(accept.indexOf(s.charAt(i))!=-1) {
+        if((accept == null || accept.isBlank()) || (s == null || s.isBlank())) {
+            return false;
+        }
+        for (int i = 0, l = accept.length(); i < l; ++i) {
+            int idx = s.indexOf(accept.charAt(i));
+            if (idx >= 0) {
                 return true;
             }
         }

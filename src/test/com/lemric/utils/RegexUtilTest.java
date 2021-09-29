@@ -20,6 +20,8 @@ class RegexUtilTest {
             }
         }
         assertTrue(condition);
+
+        StringUtils.strpbrk(null, ">?");
     }
 
 
