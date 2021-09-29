@@ -10,8 +10,27 @@ public class ArrayUtils extends org.apache.commons.lang3.ArrayUtils {
         }
         return flipped;
     }
-    public static Map<String, Object> array_replace(Map<String, Object> array, Object[] ...replacements) {
+    public static Map<String, Object> array_replace(Map<String, Object> array, Map<String, Object> ...replacements) {
+        int maxLength = array.size();
+        Map<String, Object> newArray = new HashMap<>(array);
+        for (int i = 0; i < maxLength; i++) {
+            for (Map<String, Object> replacement : replacements) {
+                if(replacement.size() > maxLength) {
+                    maxLength = replacement.size();
+                }
+            }
+        }
+        for (int i = 0; i < maxLength; i++) {
+            for (Map<String, Object> replacement : replacements) {
+                if(replacement.size() > i) {
+                    newArray.put(String.valueOf(i), replacement.get(i));
+                }
+            }
+        }
 
+        return newArray;
+    }
+    public static Map<String, Object> array_replace(Map<String, Object> array, Object[] ...replacements) {
         int maxLength = array.size();
         Map<String, Object> newArray = new HashMap<>(array);
         for (int i = 0; i < maxLength; i++) {

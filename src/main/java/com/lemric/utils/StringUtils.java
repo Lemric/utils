@@ -9,6 +9,48 @@ import java.util.regex.Pattern;
 public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
     public static final int INT_FALSE = -1;
+    private static int[] masks = {128, 64, 32, 16, 8};
+
+    public static boolean validUtf8(int[] data) {
+        int len = data.length;
+
+        // for each value in the data array we have to take
+        // the "and" with the masks array
+        for (int i = 0; i < len; i++) {
+            int curr = data[i];
+
+            // method to check the array if the
+            // and with the num and masks array is
+            // 0 then return true
+            int type = getType(curr);
+
+            if (type == 0) {
+                continue;
+            } else if (type > 1 && i + type <= len) {
+                while (type-- > 1) {
+                    if (getType(data[++i]) != 1) {
+                        return false;
+                    }
+                }
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // method to check the type
+    public static  int getType(int num) {
+        for (int i = 0; i < 5; i++) {
+
+            // checking the each input
+            if ((masks[i] & num) == 0) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
 
     private static boolean empty(String string) {
         if (string == null || string.length() < 1) {

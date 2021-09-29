@@ -91,12 +91,20 @@ public class Pcre {
     public Pcre() {
     }
 
-    public static boolean preg_match(String pattern, String subject) {
-        return preg_match(pattern, subject, new HashMap<>());
+    public static boolean preg_match(String pattern, String input) {
+        return preg_match(pattern, input, new HashMap<>());
     }
 
     public static boolean preg_match(String pattern, String input, Map<String, Object> matches) {
-        Pattern r = Pcre.compile(pattern);
+        return preg_match(pattern, input, matches, null);
+    }
+    public static boolean preg_match(String pattern, String input, Map<String, Object> matches, Integer flags) {
+        Pattern r;
+        if(flags != null) {
+            r = Pcre.compile(pattern, flags);
+        } else {
+            r = Pcre.compile(pattern);
+        }
         Matcher m = r.matcher(input);
 
         if (m.matches()) {
@@ -115,7 +123,15 @@ public class Pcre {
     }
 
     public static String[] preg_match_all(String pattern, String subject) {
-        Pattern p = Pcre.compile(pattern);
+        return preg_match_all(pattern, subject, null);
+    }
+    public static String[] preg_match_all(String pattern, String subject, Integer flags) {
+        Pattern p;
+        if(flags != null) {
+            p = Pcre.compile(pattern, flags);
+        } else {
+            p = Pcre.compile(pattern);
+        }
         return preg_match_all(p, subject);
     }
 
@@ -328,6 +344,10 @@ public class Pcre {
 
     public static String preg_quote(String str) {
         return Pcre.str_replace(Pcre.SLASH_CHARACTERS, Pcre.SLASH_CHARACTERS_SUBSTITUTION, str);
+    }
+
+    public static Pattern compile(String pattern, int flags) {
+        return Pattern.compile(Pcre.getPatternWithoutFlags(pattern), flags);
     }
 
     public static Pattern compile(String pattern) {
