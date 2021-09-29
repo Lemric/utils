@@ -19,9 +19,15 @@ package com.lemric.utils;
  */
 
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,6 +36,54 @@ public class URLUtils {
     private static java.net.URL url = null;
     private static Pattern p = null;
     private static String lastKey = null;
+    private static String internalEncoding = "UTF-8";
+
+    public static Map<String, Object> parse_str(String queryString) throws Exception {
+        return URLUtils.parse_str(queryString, null);
+    }
+    public static Map<String, Object> parse_str(String queryString, String enc) throws Exception {
+        int find1 = queryString.indexOf("?");
+        if (find1 > -1) {
+            queryString = queryString.substring(find1 + 1);
+        }
+        find1 = queryString.indexOf("#");
+        if (find1 > -1) {
+            queryString = queryString.substring(0, find1);
+        }
+        Map<String, Object> paramsMap = new LinkedHashMap<String, Object>();
+        if (queryString != null && queryString.length() > 0) {
+            int ampersandIndex, lastAmpersandIndex = 0;
+            String subStr, param, value;
+            String[] paramPair, values, newValues;
+            do {
+                ampersandIndex = queryString.indexOf('&', lastAmpersandIndex) + 1;
+                if (ampersandIndex > 0) {
+                    subStr = queryString.substring(lastAmpersandIndex, ampersandIndex - 1);
+                    lastAmpersandIndex = ampersandIndex;
+                } else {
+                    subStr = queryString.substring(lastAmpersandIndex);
+                }
+                paramPair = subStr.split("=");
+                param = paramPair[0];
+                value = paramPair.length == 1 ? "" : paramPair[1];
+                try {
+                    value = URLDecoder.decode(value, enc);
+                } catch (Exception ignored) {
+                }
+                if (paramsMap.containsKey(param)) {
+                    values = (String[]) paramsMap.get(param);
+                    int len = values.length;
+                    newValues = new String[len + 1];
+                    System.arraycopy(values, 0, newValues, 0, len);
+                    newValues[len] = value;
+                } else {
+                    newValues = new String[] { value };
+                }
+                paramsMap.put(param, newValues);
+            } while (ampersandIndex > 0);
+        }
+        return paramsMap;
+    }
 
     public static String rawUrlDecode(String s)
     {
@@ -267,5 +321,39 @@ public class URLUtils {
             return m.group(2);
         }
         return null;
+    }
+
+    public static String http_build_query(Map<String, Object> params, String numeric_prefix, String arg_separator) throws UnsupportedEncodingException {
+
+        List<String> list_query = new ArrayList<String>();
+        String result = "";
+        for(Map.Entry<String, Object> e : params.entrySet()){
+            if(e.getKey().isEmpty()) continue;
+            list_query.add(URLEncoder.encode(e.getKey(), internalEncoding) + "=" +URLEncoder.encode((String) e.getValue(), internalEncoding));
+        }
+        String[] array_query = new String[ list_query.size() ];
+        list_query.toArray( array_query );
+        result=  implodeArray(array_query,arg_separator);
+        return result;
+    }
+
+    public static String implodeArray(String[] inputArray, String glueString) {
+
+        /** Output variable */
+        String output = "";
+
+        if (inputArray.length > 0) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(inputArray[0]);
+
+            for (int i=1; i<inputArray.length; i++) {
+                sb.append(glueString);
+                sb.append(inputArray[i]);
+            }
+
+            output = sb.toString();
+        }
+
+        return output;
     }
 }
