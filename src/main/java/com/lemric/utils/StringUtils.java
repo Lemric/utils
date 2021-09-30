@@ -573,6 +573,23 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         return false;
     }
 
+    public static String strstr(String X, String Y) {
+        if (Y == null || Y.length() == 0) {
+            return X;
+        }
+
+        for (int i = 0; i < X.length(); i++)
+        {
+            if (X.charAt(i) == Y.charAt(0))
+            {
+                String s = strstr(X.substring(i + 1), Y.substring(1));
+                return (s != null) ? X.charAt(i) + s : null;
+            }
+        }
+
+        return null;
+    }
+
     public static boolean str_contains(String check, String frag) {
         char[] chk = check.toCharArray();
         char[] frg = frag.toCharArray();

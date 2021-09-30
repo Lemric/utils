@@ -328,8 +328,8 @@ public class URLUtils {
         List<String> list_query = new ArrayList<String>();
         String result = "";
         for(Map.Entry<String, Object> e : params.entrySet()){
-            if(e.getKey().isEmpty()) continue;
-            list_query.add(URLEncoder.encode(e.getKey(), internalEncoding) + "=" +URLEncoder.encode((String) e.getValue(), internalEncoding));
+            if(e.getKey().isEmpty() || e.getValue() == null) continue;
+            list_query.add(URLEncoder.encode(e.getKey(), internalEncoding) + "=" +URLEncoder.encode(e.getValue().toString(), internalEncoding));
         }
         String[] array_query = new String[ list_query.size() ];
         list_query.toArray( array_query );

@@ -10,13 +10,31 @@ public class ArrayUtils extends org.apache.commons.lang3.ArrayUtils {
         }
         return flipped;
     }
+    public static Map<String, Integer> array_flip(String[] map) {
+        Map<String, Integer> flipped = new HashMap<>();
+        for(int i = 0; i < map.length; i++) {
+            flipped.put(map[i], i);
+        }
+        return flipped;
+    }
+    public static <T> T array_pop(T[] array) {
+        T[] arrayOld = (T[]) new Object[array.length];
+        System.arraycopy(array, 0, arrayOld, 0, arrayOld.length);
+        array = ArrayUtils.remove(array, array.length - 1);
+
+        return arrayOld[array.length - 1];
+    }
+    public static <T> T[] unset(T[] array, int index) {
+        return ArrayUtils.remove(array, index);
+    }
+    public static <T> boolean isset(T[] array, int index) {
+        return array.length >= index+1 && array[index] != null;
+    }
 
     public static Map<String, Object> array_replace(Map<String, Object> array, Map<String, Object> ...replacements) {
         Map<String, Object> newArray = new HashMap<>(array);
         for (Map<String, Object> replacement : replacements) {
-            for (Map.Entry<String, Object> stringObjectEntry : replacement.entrySet()) {
-                newArray.put(stringObjectEntry.getKey(), stringObjectEntry.getValue());
-            }
+            newArray.putAll(replacement);
         }
 
         return newArray;
@@ -69,5 +87,16 @@ public class ArrayUtils extends org.apache.commons.lang3.ArrayUtils {
     public static Object[] array_unique(Object array[]) {
         SortedSet<Object> set = new TreeSet<>(Arrays.asList(array));
         return set.toArray();
+    }
+    public static <K> Map<K, Object> array_diff_key(Map<K, Object> array1, Map<K, Object> array2, Map<K, Object> ...arrays) {
+        array_diff_key__remove_common_key(array1, array2);
+        for (Map<K, Object> currentArray : arrays) {
+            array_diff_key__remove_common_key(array1, currentArray);
+        }
+        return array1;
+    }
+
+    private static <K> void array_diff_key__remove_common_key(Map<K, Object> array1, Map<K, Object> array2) {
+        array1.entrySet().removeIf(ktEntry -> array2.containsKey(ktEntry.getKey()));
     }
 }
