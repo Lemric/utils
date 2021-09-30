@@ -18,12 +18,9 @@ package com.lemric.utils;
  * limitations under the License.
  */
 
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -325,13 +322,19 @@ public class URLUtils {
 
     public static String http_build_query(Map<String, Object> params, String numeric_prefix, String arg_separator) throws UnsupportedEncodingException {
 
-        List<String> list_query = new ArrayList<String>();
+        List<String> list_query = new ArrayList<>();
         String result = "";
         for(Map.Entry<String, Object> e : params.entrySet()){
-            if(e.getKey().isEmpty() || e.getValue() == null) continue;
-            list_query.add(URLEncoder.encode(e.getKey(), internalEncoding) + "=" +URLEncoder.encode(e.getValue().toString(), internalEncoding));
+            if(e.getKey().isEmpty() || e.getValue() == null) {
+                continue;
+            }
+            String paramsString = e.getValue().toString();
+            if(e.getValue() instanceof String[]) {
+                paramsString = String.join(",", (String[]) e.getValue());
+            }
+            list_query.add(URLEncoder.encode(e.getKey(), internalEncoding) + "=" +URLEncoder.encode(paramsString, internalEncoding));
         }
-        String[] array_query = new String[ list_query.size() ];
+        String[] array_query = new String[list_query.size()];
         list_query.toArray( array_query );
         result=  implodeArray(array_query,arg_separator);
         return result;
