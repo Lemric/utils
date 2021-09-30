@@ -328,11 +328,18 @@ public class URLUtils {
             if(e.getKey().isEmpty() || e.getValue() == null) {
                 continue;
             }
-            String paramsString = e.getValue().toString();
+            StringBuilder paramsString = new StringBuilder(e.getValue().toString());
             if(e.getValue() instanceof String[]) {
-                paramsString = String.join(",", (String[]) e.getValue());
+                String[] paramArray = new String[((String[]) e.getValue()).length];
+                for (int i = 0; i < ((String[]) e.getValue()).length; i++) {
+                    paramArray[i] = URLEncoder.encode(e.getKey() + "[" + i + "]", internalEncoding) + "=" + URLEncoder.encode(((String[]) e.getValue())[i], internalEncoding);
+                }
+                list_query.add(String.join("&", paramArray));
+
+            } else {
+                list_query.add(URLEncoder.encode(e.getKey(), internalEncoding) + "=" +URLEncoder.encode(paramsString.toString(), internalEncoding));
             }
-            list_query.add(URLEncoder.encode(e.getKey(), internalEncoding) + "=" +URLEncoder.encode(paramsString, internalEncoding));
+
         }
         String[] array_query = new String[list_query.size()];
         list_query.toArray( array_query );
