@@ -1,7 +1,11 @@
 package com.lemric.utils;
 
+import org.apache.commons.lang3.math.NumberUtils;
+
 import java.util.*;
 import java.util.function.Function;
+
+import static org.apache.commons.lang3.StringUtils.isNumeric;
 
 public class ArrayUtils extends org.apache.commons.lang3.ArrayUtils {
     public static <K,V> Map<V,K> array_flip(Map<K,V> map) {
