@@ -1,6 +1,7 @@
 package com.lemric.utils;
 
 import java.util.*;
+import java.util.function.Function;
 
 public class ArrayUtils extends org.apache.commons.lang3.ArrayUtils {
     public static <K,V> Map<V,K> array_flip(Map<K,V> map) {
@@ -98,5 +99,55 @@ public class ArrayUtils extends org.apache.commons.lang3.ArrayUtils {
 
     private static <K> void array_diff_key__remove_common_key(Map<K, Object> array1, Map<K, Object> array2) {
         array1.entrySet().removeIf(ktEntry -> array2.containsKey(ktEntry.getKey()));
+    }
+
+    public static <K> Map<K, Object> array_udiff_assoc(Function<ArrayList, Integer> callback, Map<K, Object>... arrays) {
+        if (arrays.length < 2) {
+            return null;
+        }
+
+        if (!(arrays[0] instanceof Map)) {
+            return null;
+        }
+        Map<K, Object> array = arrays[0];
+        Map<K, Object> diffArray = new HashMap<>();
+        boolean isFound = false;
+        for (K entryKey : array.keySet()) {
+            Object entryValue = array.get(entryKey);
+            for (int k = 1; k < arrays.length && !isFound; k++) {
+                if (!(arrays[k] instanceof Map)) {
+                    return null;
+                }
+                Map<K, Object> checkArray = arrays[k];
+                for (Map.Entry<K, Object> entry : checkArray.entrySet()) {
+                    try {
+                        boolean keyFound = entryKey.equals(entry.getKey());
+                        boolean valueFound = false;
+                        if (keyFound) {
+                            valueFound = callback.apply(new ArrayList<Object>() {{
+                                add(entryValue);
+                                add(entry.getValue());
+                            }}) == 0;
+                        }
+
+                        isFound = keyFound && valueFound;
+                    } catch (Exception t) {
+                        t.printStackTrace();
+                    }
+
+                    if (isFound) {
+                        break;
+                    }
+                }
+            }
+
+            if (!isFound) {
+                diffArray.put(entryKey, entryValue);
+            }
+
+            isFound = false;
+        }
+
+        return diffArray;
     }
 }

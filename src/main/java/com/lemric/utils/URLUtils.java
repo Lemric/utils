@@ -325,26 +325,33 @@ public class URLUtils {
         List<String> list_query = new ArrayList<>();
         String result = "";
         for(Map.Entry<String, Object> e : params.entrySet()){
-            if(e.getKey().isEmpty() || e.getValue() == null) {
+            String key = e.getKey();
+            if(key.isEmpty() || e.getValue() == null) {
                 continue;
             }
             StringBuilder paramsString = new StringBuilder(e.getValue().toString());
             if(e.getValue() instanceof String[]) {
                 String[] paramArray = new String[((String[]) e.getValue()).length];
                 for (int i = 0; i < ((String[]) e.getValue()).length; i++) {
-                    paramArray[i] = URLEncoder.encode(e.getKey() + "[" + i + "]", internalEncoding) + "=" + URLEncoder.encode(((String[]) e.getValue())[i], internalEncoding);
+                    String s = ((String[]) e.getValue())[i];
+                    paramArray[i] = URLEncoder.encode(key + "[" + i + "]", internalEncoding) + "=" + URLEncoder.encode(s, internalEncoding);
                 }
-                list_query.add(String.join("&", paramArray));
-
+                list_query.add(String.join(arg_separator, paramArray));
+            } else if(e.getValue() instanceof Map) {
+                String[] paramArray = new String[((Map<String, Object>)e.getValue()).size()];
+                int i = 0;
+                for (Map.Entry<String, Object> stringObjectEntry : ((Map<String, Object>) e.getValue()).entrySet()) {
+                    paramArray[i] = URLEncoder.encode(key + "[" + stringObjectEntry.getKey() + "]", internalEncoding) + "=" +
+                            URLEncoder.encode(stringObjectEntry.getValue().toString(), internalEncoding);
+                    i++;
+                }
+                list_query.add(String.join(arg_separator, paramArray));
             } else {
-                list_query.add(URLEncoder.encode(e.getKey(), internalEncoding) + "=" +URLEncoder.encode(paramsString.toString(), internalEncoding));
+                list_query.add(URLEncoder.encode(key, internalEncoding) + "=" +URLEncoder.encode(paramsString.toString(), internalEncoding));
             }
-
         }
-        String[] array_query = new String[list_query.size()];
-        list_query.toArray( array_query );
-        result=  implodeArray(array_query,arg_separator);
-        return result;
+
+        return String.join(arg_separator, list_query);
     }
 
     public static String implodeArray(String[] inputArray, String glueString) {
