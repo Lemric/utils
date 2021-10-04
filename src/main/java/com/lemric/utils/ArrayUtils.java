@@ -23,11 +23,13 @@ public class ArrayUtils extends org.apache.commons.lang3.ArrayUtils {
         return flipped;
     }
     public static <T> T array_pop(T[] array) {
-        T[] arrayOld = (T[]) new Object[array.length];
-        System.arraycopy(array, 0, arrayOld, 0, arrayOld.length);
-        array = ArrayUtils.remove(array, array.length - 1);
+        T[] arrayOld = array.clone();
+        T[] arrayNew = array.clone();
+        System.arraycopy(arrayNew, 0, arrayNew, 0, arrayNew.length);
+        arrayNew = ArrayUtils.remove(arrayNew, arrayNew.length - 1);
+        array = arrayNew;
 
-        return arrayOld[array.length - 1];
+        return arrayOld[0];
     }
     public static <T> T[] unset(T[] array, int index) {
         return ArrayUtils.remove(array, index);
@@ -153,5 +155,19 @@ public class ArrayUtils extends org.apache.commons.lang3.ArrayUtils {
         }
 
         return diffArray;
+    }
+
+    public static <T> T[] array_unshift(T[] array, T ...values) {
+        T[] newArray = (T[])java.lang.reflect.Array.newInstance(array.getClass().getComponentType(), (array.length + values.length) - 1);
+        int i = 0;
+        for (T value : values) {
+            newArray[i] = value;
+            i++;
+        }
+        for (T value : array) {
+            newArray[i] = value;
+            i++;
+        }
+        return newArray;
     }
 }
