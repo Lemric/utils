@@ -2,6 +2,7 @@ package com.lemric.utils;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Function;
 
@@ -95,15 +96,31 @@ public class ArrayUtils extends org.apache.commons.lang3.ArrayUtils {
         SortedSet<Object> set = new TreeSet<>(Arrays.asList(array));
         return set.toArray();
     }
-    public static <K> Map<K, Object> array_diff_key(Map<K, Object> array1, Map<K, Object> array2, Map<K, Object> ...arrays) {
+    public static String[] array_diff(String[] first, String[] second) {
+        Set<String> ad = new HashSet<String>(List.of(first));
+        Set<String> bd = new HashSet<String>(List.of(second));
+        ad.removeAll(bd);
+
+        return ad.toArray(String[]::new);
+    }
+    public static <T> T[] array_diff(T[] first, T[] second) {
+        Set<T> ad = new HashSet<T>(List.of(first));
+        Set<T> bd = new HashSet<T>(List.of(second));
+        ad.removeAll(bd);
+
+        T[] objects = (T[]) ad.toArray();
+        return objects;
+    }
+    
+    public static <K, T> Map<K, T> array_diff_key(Map<K, T> array1, Map<K, T> array2, Map<K, T> ...arrays) {
         array_diff_key__remove_common_key(array1, array2);
-        for (Map<K, Object> currentArray : arrays) {
+        for (Map<K, T> currentArray : arrays) {
             array_diff_key__remove_common_key(array1, currentArray);
         }
         return array1;
     }
 
-    private static <K> void array_diff_key__remove_common_key(Map<K, Object> array1, Map<K, Object> array2) {
+    private static <K, T> void array_diff_key__remove_common_key(Map<K, T> array1, Map<K, T> array2) {
         array1.entrySet().removeIf(ktEntry -> array2.containsKey(ktEntry.getKey()));
     }
 
